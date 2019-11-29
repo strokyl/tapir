@@ -10,10 +10,11 @@ import zio.{DefaultRuntime, IO, Task, UIO}
 import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s._
+import reflect.runtime.universe.TypeTag
 
 object ZioExampleHttp4sServer extends App {
   // extension methods for ZIO; not a strict requirement, but they make working with ZIO much nicer
-  implicit class ZioEndpoint[I, E, O](e: Endpoint[I, E, O, EntityBody[Task]]) {
+  implicit class ZioEndpoint[I, E: TypeTag, O: TypeTag](e: Endpoint[I, E, O, EntityBody[Task]]) {
     def toZioRoutes(logic: I => IO[E, O])(implicit serverOptions: Http4sServerOptions[Task]): HttpRoutes[Task] = {
       import sttp.tapir.server.http4s._
       e.toRoutes(i => logic(i).either)

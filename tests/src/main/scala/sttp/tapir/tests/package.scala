@@ -169,6 +169,19 @@ package object tests {
         )
       )
 
+  /*
+  val in_string_out_status_from_type_erasure: Endpoint[String, Unit, Option[Either[Int, String]], Nothing] =
+    endpoint
+      .in(query[String]("fruit"))
+      .out(
+        oneOf[Option[Either[Int, String]]](
+          statusMapping(StatusCode.NoContent, emptyOutput.map(_ => None)(_ => ())),
+          statusMapping(StatusCode.Accepted, plainBody[Int].map[Some[Left[Int, String]]]{ i: Int => Some(Left(i))}(_.get.left.get)),
+          statusMapping(StatusCode.Ok, plainBody[String].map[Some[Right[Int, String]]]{ s: String => Some(Right(s))}(_.get.right.get))
+        )
+      )
+  */
+
   val in_string_out_status_from_type_erasure: Endpoint[String, Unit, Option[Either[Int, String]], Nothing] =
     endpoint
       .in(query[String]("fruit"))
@@ -179,6 +192,7 @@ package object tests {
           statusMapping(StatusCode.Ok, jsonBody[Some[Right[Int, String]]])
         )
       )
+
   val in_string_out_status_from_string_one_empty: Endpoint[String, Unit, Either[Unit, String], Nothing] =
     endpoint
       .in(query[String]("fruit"))

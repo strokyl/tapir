@@ -6,18 +6,21 @@ import sttp.tapir.internal._
 import sttp.tapir.{CodecForOptional, CodecFormat, EndpointIO, EndpointOutput, StreamingEndpointIO}
 
 import scala.annotation.tailrec
+import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe.Type
+import scala.reflect.runtime.universe.typeOf
 
 class EncodeOutputs[B](encodeOutputBody: EncodeOutputBody[B]) {
-  def apply(output: EndpointOutput[_], v: Any, initialOutputValues: OutputValues[B]): OutputValues[B] = {
+  def apply[O: TypeTag](output: EndpointOutput[_], v: O, initialOutputValues: OutputValues[B]): OutputValues[B] = {
     @tailrec
-    def run(outputs: Vector[EndpointOutput.Single[_]], ov: OutputValues[B], vs: Seq[Any]): OutputValues[B] = {
+    def run(outputs: Vector[EndpointOutput.Single[_]], ov: OutputValues[B], vs: Seq[(Option[Type], Any)]): OutputValues[B] = {
       (outputs, vs) match {
         case (Vector(), Seq()) => ov
         case (EndpointOutput.FixedStatusCode(sc, _) +: outputsTail, _) =>
           run(outputsTail, ov.withStatusCode(sc), vs)
         case (EndpointIO.FixedHeader(name, value, _) +: outputsTail, _) =>
           run(outputsTail, ov.withHeader(name -> value), vs)
-        case (outputsHead +: outputsTail, vsHead +: vsTail) =>
+        case (outputsHead +: outputsTail, (tagType, vsHead) +: vsTail) =>
           val ov2 = outputsHead match {
             case EndpointIO.Body(codec, _) =>
               codec
@@ -46,9 +49,16 @@ class EncodeOutputs[B](encodeOutputBody: EncodeOutputBody[B]) {
             case EndpointIO.FixedHeader(_, _, _) =>
               throw new IllegalStateException("Already handled") // to make the exhaustiveness checker happy
             case EndpointOutput.OneOf(mappings) =>
-              val mapping = mappings
-                .find(mapping => mapping.ct.runtimeClass.isInstance(vsHead))
+              val mappingFromTagType =
+                tagType.flatMap(someTagType => mappings.find(mapping => someTagType <:< mapping.ct.tpe))
+
+              val mappingFromRuntimeClass = mappings
+                .find(mapping => mapping.ct.mirror.runtimeClass(mapping.ct.tpe).isInstance(vsHead))
+
+              val mapping = mappingFromTagType
+                .orElse(mappingFromRuntimeClass)
                 .getOrElse(throw new IllegalArgumentException(s"No status code mapping for value: $vsHead, in output: $output"))
+
               apply(mapping.output, vsHead, mapping.statusCode.map(ov.withStatusCode).getOrElse(ov))
             case EndpointOutput.Mapped(wrapped, _, g) =>
               apply(wrapped, g.asInstanceOf[Any => Any](vsHead), ov)
@@ -59,7 +69,7 @@ class EncodeOutputs[B](encodeOutputBody: EncodeOutputBody[B]) {
       }
     }
 
-    run(output.asVectorOfSingleOutputs, initialOutputValues, ParamsToSeq(v))
+    run(output.asVectorOfSingleOutputs, initialOutputValues, ParamsToSeqWithType(v))
   }
 }
 

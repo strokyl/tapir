@@ -20,6 +20,7 @@ import sttp.tapir.tests.TestUtil._
 import sttp.tapir.tests._
 
 import scala.reflect.ClassTag
+import reflect.runtime.universe.TypeTag
 
 trait ServerTests[R[_], S, ROUTE] extends FunSuite with Matchers with BeforeAndAfterAll with StrictLogging {
   private val basicStringRequest = basicRequest.response(asStringAlways)
@@ -630,19 +631,19 @@ trait ServerTests[R[_], S, ROUTE] extends FunSuite with Matchers with BeforeAndA
   def pureResult[T](t: T): R[T]
   def suspendResult[T](t: => T): R[T]
 
-  def route[I, E, O](
+  def route[I, E: TypeTag, O: TypeTag](
       e: Endpoint[I, E, O, S],
       fn: I => R[Either[E, O]],
       decodeFailureHandler: Option[DecodeFailureHandler] = None
   ): ROUTE
 
-  def routeRecoverErrors[I, E <: Throwable, O](e: Endpoint[I, E, O, S], fn: I => R[O])(implicit eClassTag: ClassTag[E]): ROUTE
+  def routeRecoverErrors[I, E <: Throwable: TypeTag, O: TypeTag](e: Endpoint[I, E, O, S], fn: I => R[O])(implicit eClassTag: ClassTag[E]): ROUTE
 
   def server(routes: NonEmptyList[ROUTE], port: Port): Resource[IO, Unit]
 
   def portCounter: PortCounter
 
-  def testServer[I, E, O](
+  def testServer[I, E: TypeTag, O: TypeTag](
       e: Endpoint[I, E, O, S],
       testNameSuffix: String = "",
       decodeFailureHandler: Option[DecodeFailureHandler] = None

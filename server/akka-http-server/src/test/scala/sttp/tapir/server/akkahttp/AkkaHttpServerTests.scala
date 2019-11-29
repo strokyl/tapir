@@ -19,6 +19,7 @@ import sttp.tapir.tests.{Port, PortCounter}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
 
 class AkkaHttpServerTests extends ServerTests[Future, AkkaStream, Route] with StrictLogging {
   private implicit var actorSystem: ActorSystem = _
@@ -33,7 +34,7 @@ class AkkaHttpServerTests extends ServerTests[Future, AkkaStream, Route] with St
     super.afterAll()
   }
 
-  override def route[I, E, O](
+  override def route[I, E: TypeTag, O: TypeTag](
       e: Endpoint[I, E, O, AkkaStream],
       fn: I => Future[Either[E, O]],
       decodeFailureHandler: Option[DecodeFailureHandler] = None
@@ -44,7 +45,7 @@ class AkkaHttpServerTests extends ServerTests[Future, AkkaStream, Route] with St
     e.toRoute(fn)
   }
 
-  override def routeRecoverErrors[I, E <: Throwable, O](e: Endpoint[I, E, O, AkkaStream], fn: I => Future[O])(
+  override def routeRecoverErrors[I, E <: Throwable: TypeTag, O: TypeTag](e: Endpoint[I, E, O, AkkaStream], fn: I => Future[O])(
       implicit eClassTag: ClassTag[E]
   ): Route = {
     e.toRouteRecoverErrors(fn)

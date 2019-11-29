@@ -7,9 +7,10 @@ import sttp.tapir.typelevel.{ParamsToTuple, ReplaceFirstInTuple}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
 
 trait TapirAkkaHttpServer {
-  implicit class RichAkkaHttpEndpoint[I, E, O](e: Endpoint[I, E, O, AkkaStream]) {
+  implicit class RichAkkaHttpEndpoint[I, E: TypeTag, O: TypeTag](e: Endpoint[I, E, O, AkkaStream]) {
     def toDirective[T](implicit paramsToTuple: ParamsToTuple.Aux[I, T], akkaHttpOptions: AkkaHttpServerOptions): Directive[T] =
       new EndpointToAkkaServer(akkaHttpOptions).toDirective(e)
 
@@ -23,7 +24,7 @@ trait TapirAkkaHttpServer {
     }
   }
 
-  implicit class RichAkkaHttpServerEndpoint[I, E, O](serverEndpoint: ServerEndpoint[I, E, O, AkkaStream, Future]) {
+  implicit class RichAkkaHttpServerEndpoint[I, E: TypeTag, O: TypeTag](serverEndpoint: ServerEndpoint[I, E, O, AkkaStream, Future]) {
     def toDirective[T](implicit paramsToTuple: ParamsToTuple.Aux[I, T], akkaHttpOptions: AkkaHttpServerOptions): Directive[T] =
       new EndpointToAkkaServer(akkaHttpOptions).toDirective(serverEndpoint.endpoint)
 

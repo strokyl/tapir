@@ -8,24 +8,13 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.StreamConverters
 import akka.util.ByteString
+import scala.reflect.runtime.universe.TypeTag
 import sttp.model.{Header, HeaderNames, Part}
 import sttp.tapir.server.internal.{EncodeOutputBody, EncodeOutputs, OutputValues}
-import sttp.tapir.{
-  ByteArrayValueType,
-  ByteBufferValueType,
-  CodecForOptional,
-  CodecFormat,
-  CodecMeta,
-  EndpointOutput,
-  FileValueType,
-  InputStreamValueType,
-  MultipartValueType,
-  RawPart,
-  StringValueType
-}
+import sttp.tapir.{ByteArrayValueType, ByteBufferValueType, CodecForOptional, CodecFormat, CodecMeta, EndpointOutput, FileValueType, InputStreamValueType, MultipartValueType, RawPart, StringValueType}
 
 private[akkahttp] object OutputToAkkaRoute {
-  def apply[O](defaultStatusCode: AkkaStatusCode, output: EndpointOutput[O], v: O): Route = {
+  def apply[O: TypeTag](defaultStatusCode: AkkaStatusCode, output: EndpointOutput[O], v: O): Route = {
     val outputValues = encodeOutputs(output, v, OutputValues.empty)
 
     val statusCode = outputValues.statusCode.map(c => AkkaStatusCode.int2StatusCode(c.code)).getOrElse(defaultStatusCode)

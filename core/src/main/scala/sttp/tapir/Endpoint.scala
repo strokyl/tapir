@@ -6,6 +6,7 @@ import sttp.tapir.EndpointOutput.StatusMapping
 import sttp.tapir.RenderPathTemplate.{RenderPathParam, RenderQueryParam}
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.typelevel.{FnComponents, ParamConcat}
+import scala.reflect.runtime.universe._
 
 import scala.reflect.ClassTag
 
@@ -101,7 +102,7 @@ case class Endpoint[I, E, O, +S](input: EndpointInput[I], errorOutput: EndpointO
           EndpointOutput.Multiple(defaultOutputs.sortByType).show
         case _ =>
           val mappings = basicOutputsMap.map {
-            case (sc, os) => StatusMapping(sc, ClassTag.Any, EndpointOutput.Multiple(os.sortByType))
+            case (sc, os) => StatusMapping(sc, TypeTag.Any, EndpointOutput.Multiple(os.sortByType))
           }
           EndpointOutput.OneOf(mappings.toSeq).show
       }

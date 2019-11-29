@@ -1,5 +1,6 @@
 package sttp.tapir
 
+import scala.reflect.runtime.universe._
 import sttp.model.{Method, MultiQueryParams}
 import sttp.tapir.Codec.PlainCodec
 import sttp.tapir.CodecForMany.PlainCodecForMany
@@ -177,7 +178,7 @@ object EndpointOutput {
 
   //
 
-  case class StatusMapping[O](statusCode: Option[sttp.model.StatusCode], ct: ClassTag[O], output: EndpointOutput[O])
+  case class StatusMapping[O](statusCode: Option[sttp.model.StatusCode], ct: TypeTag[O], output: EndpointOutput[O])
 
   case class OneOf[I](mappings: Seq[StatusMapping[_ <: I]]) extends Single[I] {
     override def show: String = s"status one of(${mappings.map(_.output.show).mkString("|")})"

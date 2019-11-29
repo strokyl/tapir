@@ -12,11 +12,12 @@ import sttp.tapir.server.{DecodeFailureContext, DecodeFailureHandling, ServerDef
 import sttp.tapir.{DecodeFailure, DecodeResult, Endpoint, EndpointIO, EndpointInput}
 
 import scala.reflect.ClassTag
+import reflect.runtime.universe.TypeTag
 
 class EndpointToHttp4sServer[F[_]: Sync: ContextShift](serverOptions: Http4sServerOptions[F]) {
   private val outputToResponse = new OutputToHttp4sResponse[F](serverOptions)
 
-  def toRoutes[I, E, O](se: ServerEndpoint[I, E, O, EntityBody[F], F]): HttpRoutes[F] = {
+  def toRoutes[I, E: TypeTag, O: TypeTag](se: ServerEndpoint[I, E, O, EntityBody[F], F]): HttpRoutes[F] = {
     val service: HttpRoutes[F] = HttpRoutes[F] { req: Request[F] =>
       def decodeBody(result: DecodeInputsResult): F[DecodeInputsResult] = {
         result match {
@@ -61,7 +62,7 @@ class EndpointToHttp4sServer[F[_]: Sync: ContextShift](serverOptions: Http4sServ
   }
 
   @silent("never used")
-  def toRoutesRecoverErrors[I, E, O](e: Endpoint[I, E, O, EntityBody[F]])(logic: I => F[O])(
+  def toRoutesRecoverErrors[I, E: TypeTag, O: TypeTag](e: Endpoint[I, E, O, EntityBody[F]])(logic: I => F[O])(
       implicit eIsThrowable: E <:< Throwable,
       eClassTag: ClassTag[E]
   ): HttpRoutes[F] = {

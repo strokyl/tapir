@@ -12,6 +12,7 @@ import sttp.tapir.typelevel.ParamsToTuple
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
 import scala.util.{Failure, Success}
 
 class EndpointToAkkaServer(serverOptions: AkkaHttpServerOptions) {
@@ -23,7 +24,7 @@ class EndpointToAkkaServer(serverOptions: AkkaHttpServerOptions) {
   }
 
   @silent("never used")
-  def toRouteRecoverErrors[I, E, O](
+  def toRouteRecoverErrors[I, E: TypeTag, O: TypeTag](
       e: Endpoint[I, E, O, AkkaStream]
   )(logic: I => Future[O])(implicit eIsThrowable: E <:< Throwable, eClassTag: ClassTag[E]): Route = {
     def reifyFailedFuture(f: Future[O]): Future[Either[E, O]] = {
@@ -36,7 +37,7 @@ class EndpointToAkkaServer(serverOptions: AkkaHttpServerOptions) {
     toRoute(e.serverLogic(logic.andThen(reifyFailedFuture)))
   }
 
-  def toRoute[I, E, O](se: ServerEndpoint[I, E, O, AkkaStream, Future]): Route = {
+  def toRoute[I, E: TypeTag, O: TypeTag](se: ServerEndpoint[I, E, O, AkkaStream, Future]): Route = {
     toDirective1(se.endpoint) { values =>
       extractLog { log =>
         mapResponse(

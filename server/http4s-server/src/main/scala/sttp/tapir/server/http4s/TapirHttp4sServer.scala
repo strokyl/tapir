@@ -10,9 +10,10 @@ import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.typelevel.ReplaceFirstInTuple
 
 import scala.reflect.ClassTag
+import reflect.runtime.universe.TypeTag
 
 trait TapirHttp4sServer {
-  implicit class RichHttp4sHttpEndpoint[I, E, O, F[_]](e: Endpoint[I, E, O, EntityBody[F]]) {
+  implicit class RichHttp4sHttpEndpoint[I, E: TypeTag, O: TypeTag, F[_]](e: Endpoint[I, E, O, EntityBody[F]]) {
     def toRoutes(
         logic: I => F[Either[E, O]]
     )(implicit serverOptions: Http4sServerOptions[F], fs: Sync[F], fcs: ContextShift[F]): HttpRoutes[F] = {
@@ -30,7 +31,7 @@ trait TapirHttp4sServer {
     }
   }
 
-  implicit class RichHttp4sServerEndpoint[I, E, O, F[_]](se: ServerEndpoint[I, E, O, EntityBody[F], F]) {
+  implicit class RichHttp4sServerEndpoint[I, E: TypeTag, O: TypeTag, F[_]](se: ServerEndpoint[I, E, O, EntityBody[F], F]) {
     def toRoutes(implicit serverOptions: Http4sServerOptions[F], fs: Sync[F], fcs: ContextShift[F]): HttpRoutes[F] =
       new EndpointToHttp4sServer(serverOptions).toRoutes(se)
   }

@@ -9,7 +9,7 @@ import sttp.tapir.CodecForOptional.PlainCodecForOptional
 import sttp.tapir.EndpointOutput.StatusMapping
 import sttp.tapir.model.ServerRequest
 
-import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 
 trait Tapir extends TapirDerivedInputs {
   implicit def stringToPath(s: String): EndpointInput[Unit] = EndpointInput.FixedPath(s)
@@ -97,13 +97,13 @@ trait Tapir extends TapirDerivedInputs {
   /**
     * Create a mapping to be used in [[oneOf]] output descriptions.
     */
-  def statusMapping[O: ClassTag](statusCode: StatusCode, output: EndpointOutput[O]): StatusMapping[O] =
-    StatusMapping(Some(statusCode), implicitly[ClassTag[O]], output)
+  def statusMapping[O: TypeTag](statusCode: StatusCode, output: EndpointOutput[O]): StatusMapping[O] =
+    StatusMapping(Some(statusCode), implicitly[TypeTag[O]], output)
 
   /**
     * Create a fallback mapping to be used in [[oneOf]] output descriptions.
     */
-  def statusDefaultMapping[O: ClassTag](output: EndpointOutput[O]): StatusMapping[O] = StatusMapping(None, implicitly[ClassTag[O]], output)
+  def statusDefaultMapping[O: TypeTag](output: EndpointOutput[O]): StatusMapping[O] = StatusMapping(None, implicitly[TypeTag[O]], output)
 
   /**
     * An empty output. Useful if one of `oneOf` branches should be mapped to the status code only.

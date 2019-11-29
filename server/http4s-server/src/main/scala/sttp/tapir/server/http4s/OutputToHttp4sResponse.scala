@@ -9,6 +9,7 @@ import org.http4s.util.CaseInsensitiveString
 import org.http4s.{Charset, EntityBody, EntityEncoder, Header, Headers, Response, Status, multipart}
 import sttp.model.{Part, Header => SttpHeader}
 import sttp.tapir.server.internal.{EncodeOutputBody, EncodeOutputs, OutputValues}
+import reflect.runtime.universe.TypeTag
 import sttp.tapir.{
   ByteArrayValueType,
   ByteBufferValueType,
@@ -24,7 +25,7 @@ import sttp.tapir.{
 }
 
 class OutputToHttp4sResponse[F[_]: Sync: ContextShift](serverOptions: Http4sServerOptions[F]) {
-  def apply[O](defaultStatusCode: sttp.model.StatusCode, output: EndpointOutput[O], v: O): Response[F] = {
+  def apply[O: TypeTag](defaultStatusCode: sttp.model.StatusCode, output: EndpointOutput[O], v: O): Response[F] = {
     val outputValues = encodeOutputs(output, v, OutputValues.empty)
     val statusCode = outputValues.statusCode.map(statusCodeToHttp4sStatus).getOrElse(statusCodeToHttp4sStatus(defaultStatusCode))
 
