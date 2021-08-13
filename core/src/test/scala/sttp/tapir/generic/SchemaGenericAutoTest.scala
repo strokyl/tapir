@@ -4,7 +4,7 @@ import java.math.{BigDecimal => JBigDecimal}
 import sttp.tapir.SchemaType._
 import sttp.tapir.generic.auto._
 import sttp.tapir.{FieldName, Schema, SchemaType, Validator}
-import sttp.tapir.Schema.annotations._
+import sttp.tapir.Schema.annotationsOld._
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 import sttp.tapir.Schema.SName

@@ -1,4 +1,4 @@
-package sttp.tapir
+package sttp.tapir.internal
 
 import java.io.File
 import java.nio.file.Path

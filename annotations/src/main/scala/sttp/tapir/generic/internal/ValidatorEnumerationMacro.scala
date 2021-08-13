@@ -7,7 +7,6 @@ import scala.reflect.macros.blackbox
 // based on: https://stackoverflow.com/questions/13671734/iteration-over-a-sealed-trait-in-scala
 object ValidatorEnumerationMacro {
   def apply[E: c.WeakTypeTag](c: blackbox.Context): c.Expr[Validator.Enumeration[E]] = {
-    import c.universe._
 
     val t = weakTypeOf[E]
     val symbol = t.typeSymbol.asClass

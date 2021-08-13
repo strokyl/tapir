@@ -3,6 +3,7 @@ package sttp.tapir.generic.internal
 import sttp.tapir.{MultipartCodec, Schema}
 import sttp.tapir.generic.Configuration
 import sttp.tapir.internal.CaseClassUtil
+import sttp.tapir.annotations
 
 import scala.annotation.tailrec
 import scala.reflect.macros.blackbox
@@ -79,7 +80,7 @@ object MultipartCodecMacro {
       (field, codec)
     }
 
-    val encodedNameType = c.weakTypeOf[Schema.annotations.encodedName]
+    val encodedNameType = c.weakTypeOf[annotations.encodedName]
     val partCodecPairs = fieldsWithCodecs.map { case (field, (bodyType, codec)) =>
       val fieldName = field.name.decodedName.toString
       val encodedName = util.extractStringArgFromAnnotation(field, encodedNameType)

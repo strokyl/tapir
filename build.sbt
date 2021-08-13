@@ -92,6 +92,7 @@ lazy val loggerDependencies = Seq(
 )
 
 lazy val allAggregates = core.projectRefs ++
+  annotations.projectRefs ++
   cats.projectRefs ++
   enumeratum.projectRefs ++
   refined.projectRefs ++
@@ -244,6 +245,37 @@ lazy val clientTestServer = (projectMatrix in file("client/testserver"))
 
 lazy val clientTestServer2_13 = clientTestServer.jvm(scala2_13)
 
+
+lazy val annotations: ProjectMatrix = (projectMatrix in file("annotations"))
+  .settings(commonSettings)
+  .settings(versioningSchemeSettings)
+  .settings(
+    name := "tapir-annotations",
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) =>
+          Seq(
+            "com.softwaremill.magnolia" %%% "magnolia-core" % "2.0.0-M9"
+          )
+        case _ =>
+          Seq(
+            "com.propensive" %%% "magnolia" % "0.17.0",
+            "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+            "com.47deg" %%% "scalacheck-toolbox-datetime" % "0.6.0" % Test
+          )
+      }
+    },
+  )
+  .jvmPlatform(scalaVersions = scala2Versions)
+  .jsPlatform(
+    scalaVersions = scala2Versions,
+    settings = commonJsSettings ++ Seq(
+      libraryDependencies ++= Seq(
+        "io.github.cquiroz" %%% "scala-java-time" % Versions.jsScalaJavaTime % Test
+      )
+    )
+  )
+
 // core
 
 lazy val core: ProjectMatrix = (projectMatrix in file("core"))
@@ -292,6 +324,7 @@ lazy val core: ProjectMatrix = (projectMatrix in file("core"))
       )
     )
   )
+  .dependsOn(annotations)
 //.enablePlugins(spray.boilerplate.BoilerplatePlugin)
 
 lazy val tests: ProjectMatrix = (projectMatrix in file("tests"))

@@ -2,9 +2,6 @@ package sttp.tapir.macros
 
 import magnolia.Magnolia
 import sttp.tapir.Schema
-import sttp.tapir.generic.Configuration
-import sttp.tapir.generic.internal.{OneOfMacro, SchemaMagnoliaDerivation, SchemaMapMacro}
-import sttp.tapir.internal.ModifySchemaMacro
 
 trait SchemaMacros[T] {
   def modify[U](path: T => U)(modification: Schema[U] => Schema[U]): Schema[T] = macro ModifySchemaMacro.generateModify[T, U]

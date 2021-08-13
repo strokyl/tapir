@@ -64,7 +64,7 @@ final case class TapirRequestTest5(
     @description("field-description")
     field1: Int,
     @cookie
-    @Schema.annotations.deprecated
+    @Schema.annotationsOld.deprecated
     cookie: Boolean
 )
 
@@ -100,12 +100,12 @@ final case class TapirRequestTest8(
     @query
     @description("field-8-1")
     @example(9)
-    @Schema.annotations.description("field-8-2")
-    @Schema.annotations.encodedExample(10)
-    @Schema.annotations.default(11)
-    @Schema.annotations.format("tel")
-    @Schema.annotations.validate(Validator.min(0))
-    @Schema.annotations.deprecated
+    @Schema.annotationsOld.description("field-8-2")
+    @Schema.annotationsOld.encodedExample(10)
+    @Schema.annotationsOld.default(11)
+    @Schema.annotationsOld.format("tel")
+    @Schema.annotationsOld.validate(Validator.min(0))
+    @Schema.annotationsOld.deprecated
     field: Int
 )
 

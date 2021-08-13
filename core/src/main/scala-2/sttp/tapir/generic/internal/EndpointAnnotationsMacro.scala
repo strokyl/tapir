@@ -4,6 +4,7 @@ import sttp.model.Header
 import sttp.model.headers.Cookie
 import sttp.tapir.EndpointIO.annotations._
 import sttp.tapir.{Codec, Schema}
+import sttp.tapir.annotations
 import sttp.tapir.CodecFormat.TextPlain
 import sttp.tapir.internal.CaseClassUtil
 
@@ -17,12 +18,12 @@ abstract class EndpointAnnotationsMacro(val c: blackbox.Context) {
   protected val headersType = c.weakTypeOf[headers]
   protected val cookiesType = c.weakTypeOf[cookies]
 
-  private val schemaDescriptionType = c.weakTypeOf[Schema.annotations.description]
-  private val schemaEncodedExampleType = c.weakTypeOf[Schema.annotations.encodedExample]
-  private val schemaDefaultType = c.weakTypeOf[Schema.annotations.default[_]]
-  private val schemaFormatType = c.weakTypeOf[Schema.annotations.format]
-  private val schemaDeprecatedType = c.weakTypeOf[Schema.annotations.deprecated]
-  private val schemaValidateType = c.weakTypeOf[Schema.annotations.validate[_]]
+  private val schemaDescriptionType = c.weakTypeOf[annotations.description]
+  private val schemaEncodedExampleType = c.weakTypeOf[annotations.encodedExample]
+  private val schemaDefaultType = c.weakTypeOf[annotations.default[_]]
+  private val schemaFormatType = c.weakTypeOf[annotations.format]
+  private val schemaDeprecatedType = c.weakTypeOf[annotations.deprecated]
+  private val schemaValidateType = c.weakTypeOf[Schema.annotationsOld.validate[_]]
 
   private val descriptionType = c.weakTypeOf[description]
   private val exampleType = c.weakTypeOf[example]

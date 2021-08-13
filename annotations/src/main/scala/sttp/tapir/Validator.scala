@@ -1,9 +1,7 @@
 package sttp.tapir
 
-import sttp.tapir.Schema.SName
-import sttp.tapir.macros.ValidatorMacros
-
 import scala.collection.immutable
+import macros.ValidatorMacros
 
 sealed trait Validator[T] {
   def apply(t: T): List[ValidationError[_]]

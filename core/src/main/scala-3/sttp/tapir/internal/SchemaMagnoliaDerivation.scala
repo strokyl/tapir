@@ -41,7 +41,7 @@ trait SchemaMagnoliaDerivation {
         private def typeNameToSchemaName(typeName: TypeInfo, annotations: Seq[Any]): Schema.SName = {
           def allTypeArguments(tn: TypeInfo): Seq[TypeInfo] = tn.typeParams.toList.flatMap(tn2 => tn2 +: allTypeArguments(tn2))
 
-          annotations.collectFirst { case ann: Schema.annotations.encodedName => ann.name } match {
+          annotations.collectFirst { case ann: Schema.annotationsOld.encodedName => ann.name } match {
             case Some(altName) =>
               Schema.SName(altName, Nil)
             case None =>
@@ -50,16 +50,16 @@ trait SchemaMagnoliaDerivation {
         }
 
         private def getEncodedName(annotations: Seq[Any]): Option[String] =
-          annotations.collectFirst { case ann: Schema.annotations.encodedName => ann.name }
+          annotations.collectFirst { case ann: Schema.annotationsOld.encodedName => ann.name }
 
         private def enrichSchema[X](schema: Schema[X], annotations: Seq[Any]): Schema[X] = {
           annotations.foldLeft(schema) {
-            case (schema, ann: Schema.annotations.description)               => schema.description(ann.text)
-            case (schema, ann: Schema.annotations.encodedExample)            => schema.encodedExample(ann.example)
-            case (schema, ann: Schema.annotations.default[X @unchecked])     => schema.default(ann.default)
-            case (schema, ann: Schema.annotations.validate[X @unchecked])    => schema.validate(ann.v)
-            case (schema, ann: Schema.annotations.format)                    => schema.format(ann.format)
-            case (schema, _: Schema.annotations.deprecated)                  => schema.deprecated(true)
+            case (schema, ann: Schema.annotationsOld.description)               => schema.description(ann.text)
+            case (schema, ann: Schema.annotationsOld.encodedExample)            => schema.encodedExample(ann.example)
+            case (schema, ann: Schema.annotationsOld.default[X @unchecked])     => schema.default(ann.default)
+            case (schema, ann: Schema.annotationsOld.validate[X @unchecked])    => schema.validate(ann.v)
+            case (schema, ann: Schema.annotationsOld.format)                    => schema.format(ann.format)
+            case (schema, _: Schema.annotationsOld.deprecated)                  => schema.deprecated(true)
             case (schema, _)                                                 => schema
           }
         }

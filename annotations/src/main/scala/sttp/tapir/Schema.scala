@@ -1,10 +1,10 @@
 package sttp.tapir
 
-import sttp.model.Part
 import sttp.tapir.Schema.SName
 import sttp.tapir.SchemaType._
 import sttp.tapir.generic.Derived
-import sttp.tapir.internal.{ValidatorSyntax, isBasicValue}
+import sttp.tapir.generic.internal.VariousImplicitSchemaStuff
+import sttp.tapir.internal.SchemaExtensions
 import sttp.tapir.macros.{SchemaCompanionMacros, SchemaMacros}
 
 import java.io.InputStream
@@ -35,7 +35,7 @@ case class Schema[T](
     encodedExample: Option[Any] = None,
     deprecated: Boolean = false,
     validator: Validator[T] = Validator.pass[T]
-) extends SchemaMacros[T] {
+) extends SchemaMacros[T] with VariousImplicitSchemaStuff {
 
   def map[TT](f: T => Option[TT])(g: TT => T): Schema[TT] = copy(
     schemaType = schemaType.contramap(g),
@@ -278,13 +278,7 @@ object Schema extends SchemaExtensions with LowPrioritySchema with SchemaCompani
   /** Annotations which are used during automatic schema derivation, or semi-automatic schema derivation using
     * [[Schema.derived]].
     */
-  object annotations {
-    class description(val text: String) extends StaticAnnotation
-    class encodedExample(val example: Any) extends StaticAnnotation
-    class default[T](val default: T) extends StaticAnnotation
-    class format(val format: String) extends StaticAnnotation
-    class deprecated extends StaticAnnotation
-    class encodedName(val name: String) extends StaticAnnotation
+  object annotationsOld {
     class validate[T](val v: Validator[T]) extends StaticAnnotation
   }
 }

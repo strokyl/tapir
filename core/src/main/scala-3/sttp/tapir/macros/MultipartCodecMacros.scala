@@ -20,7 +20,7 @@ object MultipartCodecMacros {
   def multipartCaseClassCodecImpl[T: Type](conf: Expr[Configuration])(using q: Quotes): Expr[MultipartCodec[T]] = {
     import quotes.reflect.*
     val caseClass = new CaseClass[q.type, T](using summon[Type[T]], q)
-    val encodedNameAnnotationSymbol = TypeTree.of[Schema.annotations.encodedName].tpe.typeSymbol
+    val encodedNameAnnotationSymbol = TypeTree.of[Schema.annotationsOld.encodedName].tpe.typeSymbol
 
     def summonPartCodec[f: Type](field: CaseClassField[q.type, T]) = {
       val candidates = List(

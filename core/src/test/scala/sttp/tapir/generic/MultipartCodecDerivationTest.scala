@@ -7,7 +7,7 @@ import sttp.tapir.{DecodeResult, FieldName, MultipartCodec, RawPart, Schema, Tap
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import sttp.tapir.Schema.SName
-import sttp.tapir.Schema.annotations.encodedName
+import sttp.tapir.Schema.annotationsOld.encodedName
 import sttp.tapir.TestUtil.field
 
 import java.nio.charset.StandardCharsets

@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers
 import sttp.capabilities.Streams
 import sttp.model.{Method, StatusCode}
 import sttp.tapir.Schema.SName
-import sttp.tapir.Schema.annotations.description
+import sttp.tapir.Schema.annotationsOld.description
 import sttp.tapir.docs.openapi.dtos.VerifyYamlTestData._
 import sttp.tapir.docs.openapi.dtos.VerifyYamlTestData2._
 import sttp.tapir.docs.openapi.dtos.Book

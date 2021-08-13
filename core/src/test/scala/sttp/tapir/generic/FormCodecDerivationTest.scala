@@ -7,7 +7,7 @@ import sttp.tapir.{Codec, CodecFormat, DecodeResult, FieldName, Schema, Validato
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import sttp.tapir.Schema.SName
-import sttp.tapir.Schema.annotations.encodedName
+import sttp.tapir.Schema.annotationsOld.encodedName
 import sttp.tapir.TestUtil.field
 
 class FormCodecDerivationTest extends AnyFlatSpec with FormCodecDerivationTestExtensions with Matchers {
